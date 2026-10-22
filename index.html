@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC (RTI) Student Self-Assessment Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2744; --navy-mid: #243560; --gold: #c8a84b; --gold-light: #f5edcf;
+    --cream: #faf8f2; --border: #ddd8cc; --text: #2a2a2a; --muted: #6b7280;
+    --input-bg: #f8f6f0; --red: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); font-size: 14px; line-height: 1.6; }
+  .site-header { background: var(--navy); color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+  .header-inner { max-width: 860px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-badge { background: var(--gold); color: var(--navy); font-family: 'DM Serif Display', serif; font-size: 18px; padding: 8px 14px; line-height: 1.1; text-align: center; }
+  .header-title h1 { font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 400; color: white; }
+  .header-title p { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 300; margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .header-actions { display: flex; gap: 8px; }
+  .btn { padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.2s; border-radius: 2px; }
+  .btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.35); color: white; }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-gold { background: var(--gold); color: var(--navy); }
+  .btn-gold:hover { background: #d4b45a; }
+  .progress-bar-wrap { background: var(--navy-mid); height: 4px; }
+  .progress-bar { height: 4px; background: var(--gold); width: 0%; transition: width 0.4s ease; }
+  .directions-banner { background: var(--gold-light); border-bottom: 2px solid var(--gold); padding: 14px 32px; }
+  .directions-inner { max-width: 860px; margin: 0 auto; font-size: 13px; color: var(--navy); }
+  .req-note { color: var(--red); font-weight: 600; }
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 32px 60px; }
+  .section-card { background: white; border: 1px solid var(--border); border-radius: 2px; margin-bottom: 28px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .section-head { background: var(--navy); color: white; padding: 12px 24px; display: flex; align-items: center; gap: 12px; }
+  .section-icon { width: 28px; height: 28px; background: var(--gold); color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .section-head h2 { font-family: 'DM Serif Display', serif; font-size: 15px; font-weight: 400; letter-spacing: 0.5px; }
+  .section-body { padding: 20px 24px; }
+  .q-block { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0ece3; }
+  .q-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .q-label { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+  .q-num { font-family: 'DM Serif Display', serif; color: var(--gold); font-size: 13px; min-width: 22px; flex-shrink: 0; }
+  .q-text { font-size: 13.5px; font-weight: 500; color: var(--navy); line-height: 1.4; }
+  .req-star { color: var(--red); margin-left: 3px; font-size: 11px; }
+  .form-input, .form-textarea { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .form-input:focus, .form-textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,168,75,0.15); background: white; }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .input-row { grid-template-columns: 1fr; } }
+  .radio-group, .check-group { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-left: 30px; }
+  .radio-opt { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 2px; cursor: pointer; font-size: 13px; color: var(--text); transition: all 0.15s; user-select: none; }
+  .radio-opt:hover { border-color: var(--gold); background: var(--gold-light); }
+  .radio-opt input[type="radio"] { accent-color: var(--navy); width: 15px; height: 15px; flex-shrink: 0; }
+  .radio-opt:has(input:checked) { border-color: var(--navy); background: rgba(26,39,68,0.06); font-weight: 600; color: var(--navy); }
+  .radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; margin-left: 30px; }
+  .form-footer { background: white; border: 1px solid var(--border); border-radius: 2px; padding: 24px; margin-bottom: 28px; }
+  .form-footer h3 { font-family: 'DM Serif Display', serif; color: var(--navy); font-size: 14px; font-weight: 400; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .sig-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+  .submit-area { text-align: center; padding: 8px 0 20px; }
+  .btn-submit { background: var(--navy); color: white; padding: 14px 48px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.2s; border-radius: 2px; box-shadow: 0 4px 14px rgba(26,39,68,0.25); }
+  .btn-submit:hover { background: var(--navy-mid); transform: translateY(-1px); }
+  .submit-note { margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+  @media print {
+    body { background: white; } .site-header { position: static; box-shadow: none; }
+    .header-actions, .progress-bar-wrap, .submit-area { display: none !important; }
+    .container { padding: 16px 0; } .section-card { box-shadow: none; break-inside: avoid; margin-bottom: 16px; }
+    .q-block { break-inside: avoid; } .form-input, .form-textarea { background: white; }
+    @page { margin: 0.6in; size: letter; }
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-badge">ATC<br>RTI</div>
+      <div class="header-title">
+        <h1>Student Self-Assessment Tool</h1>
+        <p>Confidential Student Record &nbsp;•&nbsp; Complete all required fields</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="window.print()">&#128438; Print</button>
+      <button class="btn btn-gold" onclick="saveAsPDF()">&#128196; Save as PDF</button>
+    </div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</header>
+<div class="directions-banner">
+  <div class="directions-inner">
+    <strong>Directions:</strong> This form has been designed to help make you aware of aspects in your school life that may impact your learning. Please fill out this form as it relates to this specific class. &nbsp;<span class="req-note">&#9733; = Required field</span>
+  </div>
+</div>
+<div class="container">
+<form id="assessmentForm" novalidate>
+
+  <!-- STUDENT INFORMATION -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">1</div><h2>Student Information</h2></div>
+    <div class="section-body">
+      <div class="input-row">
+        <div class="q-block">
+          <div class="q-label"><span class="q-num">1.</span><span class="q-text">First Name <span class="req-star">&#9733;</span></span></div>
+          <input class="form-input" type="text" name="first_name" placeholder="Enter first name" required>
+        </div>
+        <div class="q-block">
+          <div class="q-label"><span class="q-num">2.</span><span class="q-text">Last Name <span class="req-star">&#9733;</span></span></div>
+          <input class="form-input" type="text" name="last_name" placeholder="Enter last name" required>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="q-block">
+          <div class="q-label"><span class="q-num">3.</span><span class="q-text">Best Phone Number</span></div>
+          <input class="form-input" type="tel" name="phone" placeholder="(000) 000-0000">
+        </div>
+        <div class="q-block">
+          <div class="q-label"><span class="q-num">4.</span><span class="q-text">Email Address You Check Regularly <span class="req-star">&#9733;</span></span></div>
+          <input class="form-input" type="email" name="email" placeholder="student@email.com" required>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">5.</span><span class="q-text">Grade Level <span class="req-star">&#9733;</span></span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="grade" value="9th" required> 9th</label>
+          <label class="radio-opt"><input type="radio" name="grade" value="10th"> 10th</label>
+          <label class="radio-opt"><input type="radio" name="grade" value="11th"> 11th</label>
+          <label class="radio-opt"><input type="radio" name="grade" value="12th"> 12th</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">6.</span><span class="q-text">Which ATC Session Do You Attend? <span class="req-star">&#9733;</span></span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="session" value="AM" required> AM</label>
+          <label class="radio-opt"><input type="radio" name="session" value="PM"> PM</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">7.</span><span class="q-text">ATC Teacher Name <span class="req-star">&#9733;</span></span></div>
+        <div class="radio-grid">
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Baker" required> Baker</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Corra"> Corra</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Garrison"> Garrison</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Goldsberry"> Goldsberry</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Hess"> Hess</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Ismail"> Ismail</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Lavender"> Lavender</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Reich"> Reich</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Shiflet"> Shiflet</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Sargent"> Sargent</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Spruill"> Spruill</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Stevens"> Stevens</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Troxell"> Troxell</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Weber"> Weber</label>
+          <label class="radio-opt"><input type="radio" name="atc_teacher" value="Whitehorne"> Whitehorne</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">8.</span><span class="q-text">Home High School <span class="req-star">&#9733;</span></span></div>
+        <div class="radio-grid">
+          <label class="radio-opt"><input type="radio" name="home_school" value="Achievable Dream Academy" required> Achievable Dream Academy</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Bayside High School"> Bayside High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Cox High School"> Cox High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="First Colonial High School"> First Colonial High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Green Run Collegiate"> Green Run Collegiate</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Green Run High School"> Green Run High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Kellam High School"> Kellam High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Kempsville High School"> Kempsville High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Landstown High School"> Landstown High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Princess Anne High School"> Princess Anne High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Ocean Lakes High School"> Ocean Lakes High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Renaissance Academy"> Renaissance Academy</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Salem High School"> Salem High School</label>
+          <label class="radio-opt"><input type="radio" name="home_school" value="Tallwood High School"> Tallwood High School</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACADEMIC SUCCESS -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">2</div><h2>Academic Success</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">9.</span><span class="q-text">What is your grade in this class? <span class="req-star">&#9733;</span></span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="class_grade" value="A" required> A</label>
+          <label class="radio-opt"><input type="radio" name="class_grade" value="B"> B</label>
+          <label class="radio-opt"><input type="radio" name="class_grade" value="C"> C</label>
+          <label class="radio-opt"><input type="radio" name="class_grade" value="D"> D</label>
+          <label class="radio-opt"><input type="radio" name="class_grade" value="E"> E</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">10.</span><span class="q-text">Do you have people who support your academic success? Who?</span></div>
+        <textarea class="form-textarea" name="support_people" placeholder="Describe who supports you academically..."></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">11.</span><span class="q-text">Do you have access to Student View?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="student_view" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="student_view" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="student_view" value="Not sure"> Not sure</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">12.</span><span class="q-text">Do your parent or guardian have access to Parent View?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="parent_view" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="parent_view" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="parent_view" value="Not sure"> Not sure</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">13.</span><span class="q-text">Do you feel prepared for this class?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="prepared" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="prepared" value="No"> No</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">14.</span><span class="q-text">Do you keep an organized binder with class handouts, notes, etc.?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="binder" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="binder" value="No"> No</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">15.</span><span class="q-text">Do you do your classwork/homework?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="homework" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="homework" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="homework" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">16.</span><span class="q-text">Does classwork/homework help you understand what is taught in class?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="hw_helps" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="hw_helps" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="hw_helps" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">17.</span><span class="q-text">What can your teacher do to help?</span></div>
+        <textarea class="form-textarea" name="teacher_help" placeholder="Share any suggestions for your teacher..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAL HABITS -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">3</div><h2>Personal Habits</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">18.</span><span class="q-text">Do you have any absences? How many?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="absences" value="0-4"> 0&#8211;4</label>
+          <label class="radio-opt"><input type="radio" name="absences" value="5-10"> 5&#8211;10</label>
+          <label class="radio-opt"><input type="radio" name="absences" value="10+"> 10+</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">19.</span><span class="q-text">Do you have personal/relationship issues that impact your success at school?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="personal_issues" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="personal_issues" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="personal_issues" value="Maybe"> Maybe</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">20.</span><span class="q-text">Classroom behavior: Do you have any discipline referrals? If so, how many?</span></div>
+        <textarea class="form-textarea" name="discipline" placeholder="Describe any discipline referrals..." style="min-height:60px;"></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">21.</span><span class="q-text">Do you have a set study time? If so, when? Where? How long do you study?</span></div>
+        <textarea class="form-textarea" name="study_time" placeholder="Describe your study habits..."></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">22.</span><span class="q-text">Do you have a study partner?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="study_partner" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="study_partner" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="study_partner" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELF-ADVOCACY -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">4</div><h2>Self-Advocacy</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">23.</span><span class="q-text">Do you participate in class?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="participate" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="participate" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="participate" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">24.</span><span class="q-text">Do you seek help when you need it?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="seek_help" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="seek_help" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="seek_help" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">25.</span><span class="q-text">Do you ask questions?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="ask_questions" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="ask_questions" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="ask_questions" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">26.</span><span class="q-text">Are you prepared for class?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="class_prepared" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="class_prepared" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="class_prepared" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNICATIONS -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">5</div><h2>Communications</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">27.</span><span class="q-text">Do you feel comfortable talking with your teacher?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="comfortable_teacher" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="comfortable_teacher" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="comfortable_teacher" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">28.</span><span class="q-text">Do you send your teacher messages through Canvas or email them?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="messages_teacher" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="messages_teacher" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="messages_teacher" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">29.</span><span class="q-text">Have you had a conference with your teacher?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="teacher_conference" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="teacher_conference" value="No"> No</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">30.</span><span class="q-text">Have you had a conference with your school counselor?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="counselor_conference" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="counselor_conference" value="No"> No</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRA HELP -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">6</div><h2>Extra Help</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">31.</span><span class="q-text">Have you participated in extra help sessions for this class? How often?</span></div>
+        <textarea class="form-textarea" name="extra_help_sessions" placeholder="Describe your participation..." style="min-height:60px;"></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">32.</span><span class="q-text">Have you set up a conference with this teacher?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="setup_conference" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="setup_conference" value="No"> No</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">33.</span><span class="q-text">Are you getting extra help from this teacher on a regular basis?</span></div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="regular_help" value="Yes"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="regular_help" value="No"> No</label>
+          <label class="radio-opt"><input type="radio" name="regular_help" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER SCHOOL -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">7</div><h2>After School</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">34.</span><span class="q-text">How much time are you spending on activities such as music, sports, clubs, etc.?</span></div>
+        <textarea class="form-textarea" name="activities" placeholder="Describe your extracurricular activities..." style="min-height:60px;"></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">35.</span><span class="q-text">Are you employed? If so, how late do you work? Number of hours per week?</span></div>
+        <textarea class="form-textarea" name="employment" placeholder="Describe your employment situation..." style="min-height:60px;"></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">36.</span><span class="q-text">How many hours per night do you sleep during the school week?</span></div>
+        <input class="form-input" type="text" name="sleep_hours" placeholder="e.g. 7&#8211;8 hours">
+      </div>
+    </div>
+  </div>
+
+  <!-- NEXT STEPS -->
+  <div class="section-card">
+    <div class="section-head"><div class="section-icon">8</div><h2>Next Steps</h2></div>
+    <div class="section-body">
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">37.</span><span class="q-text">Please list two short-term goals to improve your academics (9 weeks):</span></div>
+        <textarea class="form-textarea" name="short_term_goals" placeholder="Goal 1:&#10;Goal 2:"></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">38.</span><span class="q-text">Please list one long-term career and educational goal you have (1 year):</span></div>
+        <textarea class="form-textarea" name="long_term_goal" placeholder="Describe your long-term goal..."></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">39.</span><span class="q-text">Select 1&#8211;2 focus areas from your lists that you will work on before your next grade report:</span></div>
+        <textarea class="form-textarea" name="focus_areas" placeholder="List your focus areas..." style="min-height:60px;"></textarea>
+      </div>
+      <div class="q-block">
+        <div class="q-label"><span class="q-num">40.</span><span class="q-text">Describe how you are going to address your short and long-term goals:</span></div>
+        <textarea class="form-textarea" name="goal_plan" placeholder="Describe your plan of action..." style="min-height:100px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNATURE -->
+  <div class="form-footer">
+    <h3>Acknowledgment</h3>
+    <div class="input-row">
+      <div>
+        <div class="sig-label">Student Signature (type full name)</div>
+        <input class="form-input" type="text" name="signature" placeholder="Type your full name as signature">
+      </div>
+      <div>
+        <div class="sig-label">Date</div>
+        <input class="form-input" type="date" name="submission_date">
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <button type="button" class="btn-submit" onclick="window.print()">&#128438; Print Form</button>
+    <button type="button" class="btn-submit btn-submit-pdf" onclick="saveAsPDF()" style="background:var(--gold);color:var(--navy);margin-left:12px;">&#128196; Save as PDF</button>
+    <p class="submit-note">Use <strong>Print</strong> to print a physical copy, or <strong>Save as PDF</strong> to download a completed copy for your records.</p>
+  </div>
+
+</form>
+</div>
+
+<script>
+  document.querySelector('[name="submission_date"]').valueAsDate = new Date();
+
+  function updateProgress() {
+    const allInputs = document.querySelectorAll('.form-input, .form-textarea');
+    const radioNames = [...new Set([...document.querySelectorAll('input[type="radio"]')].map(r => r.name))];
+    let total = allInputs.length + radioNames.length;
+    let filled = 0;
+    allInputs.forEach(el => { if (el.value.trim()) filled++; });
+    radioNames.forEach(name => { if (document.querySelector(`[name="${name}"]:checked`)) filled++; });
+    document.getElementById('progressBar').style.width = Math.round((filled / total) * 100) + '%';
+  }
+
+  document.getElementById('assessmentForm').addEventListener('input', updateProgress);
+  document.getElementById('assessmentForm').addEventListener('change', updateProgress);
+
+  function saveAsPDF() {
+    // Use the browser's print dialog with PDF destination
+    const originalTitle = document.title;
+    const firstName = document.querySelector('[name="first_name"]').value.trim();
+    const lastName = document.querySelector('[name="last_name"]').value.trim();
+    if (firstName || lastName) {
+      document.title = 'ATC_RTI_Self_Assessment_' + (firstName + '_' + lastName).replace(/\s+/g, '_');
+    } else {
+      document.title = 'ATC_RTI_Student_Self_Assessment';
+    }
+    window.print();
+    document.title = originalTitle;
+  }
+</script>
+</body>
+</html>
